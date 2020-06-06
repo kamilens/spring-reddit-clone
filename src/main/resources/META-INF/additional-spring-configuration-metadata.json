@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "application.emails.verification",
+      "type": "java.lang.String",
+      "description": "Description for application.emails.verification."
+    }
+  ]
+}
