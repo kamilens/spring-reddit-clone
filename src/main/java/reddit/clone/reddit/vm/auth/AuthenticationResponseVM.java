@@ -1,4 +1,4 @@
-package reddit.clone.reddit.vm;
+package reddit.clone.reddit.vm.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterVM {
+public class AuthenticationResponseVM {
 
-    private String email;
+    private String authenticationToken;
     private String username;
-    private String password;
 
 }

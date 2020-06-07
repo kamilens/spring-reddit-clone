@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reddit.clone.reddit.service.AuthService;
-import reddit.clone.reddit.vm.RegisterVM;
+import reddit.clone.reddit.vm.auth.AuthenticationResponseVM;
+import reddit.clone.reddit.vm.auth.LoginVM;
+import reddit.clone.reddit.vm.auth.RegisterVM;
 
 @RequiredArgsConstructor
 @RestController
@@ -23,6 +25,11 @@ public class AuthController {
     public ResponseEntity<String> verifyAccount(@PathVariable String token) {
         authService.verifyAccount(token);
         return ResponseEntity.ok("Account activated successfully!");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponseVM> login(@RequestBody LoginVM loginVM) {
+        return ResponseEntity.ok(authService.login(loginVM));
     }
 
 }

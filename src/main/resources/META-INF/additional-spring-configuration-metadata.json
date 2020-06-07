@@ -4,6 +4,16 @@
       "name": "application.emails.verification",
       "type": "java.lang.String",
       "description": "Description for application.emails.verification."
+    },
+    {
+      "name": "jwt.token.secret",
+      "type": "java.lang.String",
+      "description": "Description for jwt.token.secret."
+    },
+    {
+      "name": "jwt.token.expired",
+      "type": "java.lang.String",
+      "description": "Description for jwt.token.expired."
     }
   ]
 }

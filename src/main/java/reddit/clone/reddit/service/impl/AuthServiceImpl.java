@@ -1,6 +1,10 @@
 package reddit.clone.reddit.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +14,12 @@ import reddit.clone.reddit.domain.VerificationToken;
 import reddit.clone.reddit.exception.RedditException;
 import reddit.clone.reddit.repository.UserRepository;
 import reddit.clone.reddit.repository.VerificationTokenRepository;
+import reddit.clone.reddit.security.JwtProvider;
 import reddit.clone.reddit.service.AuthService;
 import reddit.clone.reddit.service.MailService;
-import reddit.clone.reddit.vm.RegisterVM;
+import reddit.clone.reddit.vm.auth.AuthenticationResponseVM;
+import reddit.clone.reddit.vm.auth.LoginVM;
+import reddit.clone.reddit.vm.auth.RegisterVM;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -22,12 +29,13 @@ import java.util.UUID;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
 
-    @Transactional
     @Override
     public void register(RegisterVM registerVM) {
         User user = User.builder()
@@ -51,6 +59,17 @@ public class AuthServiceImpl implements AuthService {
         Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
         verificationToken.orElseThrow(() -> new RedditException("Invalid token"));
         fetchUserAndEnable(verificationToken.get());
+    }
+
+    @Override
+    public AuthenticationResponseVM login(LoginVM loginVM) {
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginVM.getUsername(), loginVM.getPassword()
+        ));
+
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String token = jwtProvider.generateToken(authenticate);
+        return new AuthenticationResponseVM(token, loginVM.getUsername());
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {
