@@ -1,16 +1,19 @@
 package reddit.clone.reddit.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reddit.clone.reddit.domain.NotificationEmail;
 import reddit.clone.reddit.domain.User;
 import reddit.clone.reddit.domain.VerificationToken;
+import reddit.clone.reddit.exception.BadRequestException;
 import reddit.clone.reddit.exception.RedditException;
 import reddit.clone.reddit.repository.UserRepository;
 import reddit.clone.reddit.repository.VerificationTokenRepository;
@@ -25,6 +28,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -44,7 +48,12 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(registerVM.getPassword()))
                 .build();
 
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception ex) {
+            throw new BadRequestException();
+        }
+
         String token = generateVerificationToken(user);
         mailService.sendMail(
                 new NotificationEmail(
@@ -70,6 +79,15 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
         return new AuthenticationResponseVM(token, loginVM.getUsername());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public User getCurrentUser() {
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(principal.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {

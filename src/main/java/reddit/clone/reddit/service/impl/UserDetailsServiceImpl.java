@@ -1,6 +1,7 @@
 package reddit.clone.reddit.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import static java.util.Collections.singletonList;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 

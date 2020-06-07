@@ -13,7 +13,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
 import java.util.Date;
 
 import static javax.persistence.FetchType.LAZY;
@@ -30,21 +29,28 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @NotBlank
     @NotNull
     @NotEmpty
+    @Column(name = "title")
     private String title;
 
-    @Nullable
+    @NotBlank
+    @NotNull
+    @NotEmpty
+    @Column(name = "url", unique = true)
     private String url;
 
     @Nullable
     @Lob
+    @Column(name = "description")
     private String description;
 
     @Min(0)
+    @Column(name = "vote_count")
     private Integer voteCount = 0;
 
     @ManyToOne(fetch = LAZY)

@@ -1,6 +1,7 @@
 package reddit.clone.reddit.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reddit.clone.reddit.service.AuthService;
@@ -9,6 +10,7 @@ import reddit.clone.reddit.vm.auth.LoginVM;
 import reddit.clone.reddit.vm.auth.RegisterVM;
 
 @RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

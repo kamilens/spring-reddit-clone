@@ -14,8 +14,8 @@ import reddit.clone.reddit.exception.RedditException;
 import reddit.clone.reddit.service.MailContentBuilder;
 import reddit.clone.reddit.service.MailService;
 
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class MailServiceImpl implements MailService {
 

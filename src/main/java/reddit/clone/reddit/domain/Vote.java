@@ -22,9 +22,11 @@ public class Vote {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "vote_type")
     private VoteType voteType;
 
     @NotNull

@@ -24,9 +24,11 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @NotEmpty
+    @Column(name = "text")
     private String text;
 
     @ManyToOne(fetch = LAZY)

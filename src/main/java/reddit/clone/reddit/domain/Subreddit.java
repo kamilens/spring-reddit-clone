@@ -28,16 +28,19 @@ public class Subreddit {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @NotBlank
     @NotNull
     @NotEmpty
+    @Column(name = "name")
     private String name;
 
     @NotBlank
     @NotNull
     @NotEmpty
+    @Column(name = "description")
     private String description;
 
     @OneToMany(fetch = LAZY)

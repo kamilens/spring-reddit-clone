@@ -16,7 +16,6 @@ public class SubredditResponseVM {
     private String description;
     private Integer numberOfPosts;
     private Date creationDate;
-    private Long authorId;
-    private String authorUsername;
+    private String author;
 
 }

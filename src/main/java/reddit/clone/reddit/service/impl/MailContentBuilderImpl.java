@@ -6,8 +6,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import reddit.clone.reddit.service.MailContentBuilder;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class MailContentBuilderImpl implements MailContentBuilder {
 
     private final TemplateEngine templateEngine;

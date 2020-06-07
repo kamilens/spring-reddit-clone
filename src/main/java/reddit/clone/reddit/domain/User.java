@@ -26,22 +26,26 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @NotBlank
     @NotNull
     @NotEmpty
+    @Column(name = "username", unique = true)
     private String username;
 
     @NotBlank
     @NotNull
     @NotEmpty
+    @Column(name = "password")
     private String password;
 
     @NotBlank
     @NotNull
     @NotEmpty
     @Email
+    @Column(name = "email", unique = true)
     private String email;
 
     @CreationTimestamp
