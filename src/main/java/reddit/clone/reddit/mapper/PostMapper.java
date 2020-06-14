@@ -5,18 +5,31 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
+import reddit.clone.reddit.constants.VoteType;
 import reddit.clone.reddit.domain.Post;
 import reddit.clone.reddit.domain.User;
+import reddit.clone.reddit.domain.Vote;
 import reddit.clone.reddit.repository.CommentRepository;
+import reddit.clone.reddit.repository.VoteRepository;
+import reddit.clone.reddit.service.AuthService;
 import reddit.clone.reddit.vm.post.PostCreateRequestVM;
 import reddit.clone.reddit.vm.post.PostResponseVM;
 import reddit.clone.reddit.vm.post.PostUpdateRequestVM;
+
+import java.util.Optional;
+
+import static reddit.clone.reddit.constants.VoteType.DOWN_VOTE;
+import static reddit.clone.reddit.constants.VoteType.UP_VOTE;
 
 @Mapper(componentModel = "spring")
 public abstract class PostMapper {
 
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private VoteRepository voteRepository;
 
     @Mappings({
             @Mapping(target = "subreddit", ignore = true),
@@ -47,6 +60,8 @@ public abstract class PostMapper {
             @Mapping(target = "subredditName", source = "subreddit.name"),
             @Mapping(target = "commentCount", expression = "java(commentCount(post))"),
             @Mapping(target = "duration", expression = "java(getDuration(post))"),
+            @Mapping(target = "upVote", expression = "java(isPostUpVoted(post))"),
+            @Mapping(target = "downVote", expression = "java(isPostDownVoted(post))"),
     })
     public abstract PostResponseVM entityToResponseVM(Post post);
 
@@ -58,6 +73,26 @@ public abstract class PostMapper {
 
     protected String getDuration(Post post) {
         return TimeAgo.using(post.getCreationDate().getTime());
+    }
+
+    protected boolean isPostUpVoted(Post post) {
+        return checkVoteType(post, UP_VOTE);
+    }
+
+    protected boolean isPostDownVoted(Post post) {
+        return checkVoteType(post, DOWN_VOTE);
+    }
+
+    private boolean checkVoteType(Post post, VoteType voteType) {
+        if (authService.isLoggedId()) {
+            Optional<Vote> voteForPostByUser = voteRepository.findTopByPostAndUserOrderByIdDesc(
+                    post,
+                    authService.getCurrentUser()
+            );
+            return voteForPostByUser.filter(vote -> vote.getVoteType().equals(voteType))
+                    .isPresent();
+        }
+        return false;
     }
 
 }

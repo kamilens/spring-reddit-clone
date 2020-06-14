@@ -2,6 +2,7 @@ package reddit.clone.reddit.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -115,6 +116,12 @@ public class AuthServiceImpl implements AuthService {
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
                 .username(refreshTokenVM.getUsername())
                 .build();
+    }
+
+    @Override
+    public boolean isLoggedId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (!(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated());
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {

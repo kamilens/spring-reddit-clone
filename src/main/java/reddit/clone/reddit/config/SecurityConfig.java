@@ -3,6 +3,7 @@ package reddit.clone.reddit.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -32,8 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**")
-                .permitAll()
+                // swagger >>>
                 .antMatchers("/v2/api-docs",
                         "/configuration/ui",
                         "/swagger-resources/**",
@@ -41,8 +41,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/webjars/**")
                 .permitAll()
+                // <<< swagger
+                // h2 >>>
                 .antMatchers("/h2-console/**")
                 .permitAll()
+                // <<< h2
+                // endpoints >>>
+                .antMatchers("/api/auth/**")
+                .permitAll()
+                .antMatchers(HttpMethod.GET, "/api/subreddits")
+                .permitAll()
+                .antMatchers(HttpMethod.GET, "/api/posts/")
+                .permitAll()
+                .antMatchers(HttpMethod.GET, "/api/posts/**")
+                .permitAll()
+                // <<< endpoints
                 .anyRequest()
                 .authenticated();
         httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

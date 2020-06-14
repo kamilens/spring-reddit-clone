@@ -18,4 +18,6 @@ public interface AuthService {
 
     AuthenticationResponseVM refreshToken(RefreshTokenVM refreshTokenVM);
 
+    boolean isLoggedId();
+
 }
