@@ -9,6 +9,8 @@ import reddit.clone.reddit.vm.auth.AuthenticationResponseVM;
 import reddit.clone.reddit.vm.auth.LoginVM;
 import reddit.clone.reddit.vm.auth.RegisterVM;
 
+import javax.validation.Valid;
+
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -18,7 +20,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterVM registerVM) {
+    public ResponseEntity<String> register(@RequestBody @Valid RegisterVM registerVM) {
         authService.register(registerVM);
         return ResponseEntity.ok("User registration successful!");
     }
@@ -30,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponseVM> login(@RequestBody LoginVM loginVM) {
+    public ResponseEntity<AuthenticationResponseVM> login(@RequestBody @Valid LoginVM loginVM) {
         return ResponseEntity.ok(authService.login(loginVM));
     }
 

@@ -141,6 +141,11 @@
 			<scope>runtime</scope>
 			<version>0.10.5</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.marlonlom</groupId>
+			<artifactId>timeago</artifactId>
+			<version>4.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -14,8 +14,8 @@ public interface PostService {
 
     PostResponseVM getPostById(Long postId);
 
-    Set<PostResponseVM> getPostsBySubredditId(Long subredditId, Pageable pageable);
+    Set<PostResponseVM> getPostsBySubredditId(Pageable pageable, Long subredditId);
 
-    Set<PostResponseVM> getPostsByUsername(String username, Pageable pageable);
+    Set<PostResponseVM> getPostsByUsername(Pageable pageable, String username);
 
 }

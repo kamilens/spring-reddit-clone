@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.time.Instant;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -35,6 +31,7 @@ public class User {
     @Column(name = "username", unique = true)
     private String username;
 
+    @Size(min = 7)
     @NotBlank
     @NotNull
     @NotEmpty

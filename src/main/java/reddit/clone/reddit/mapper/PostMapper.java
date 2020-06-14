@@ -1,16 +1,23 @@
 package reddit.clone.reddit.mapper;
 
+import com.github.marlonlom.utilities.timeago.TimeAgo;
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import reddit.clone.reddit.domain.Post;
 import reddit.clone.reddit.domain.User;
+import reddit.clone.reddit.repository.CommentRepository;
 import reddit.clone.reddit.vm.post.PostCreateRequestVM;
 import reddit.clone.reddit.vm.post.PostResponseVM;
 import reddit.clone.reddit.vm.post.PostUpdateRequestVM;
 
+@RequiredArgsConstructor
 @Mapper(componentModel = "spring")
-public interface PostMapper {
+public abstract class PostMapper {
+
+    private final CommentRepository commentRepository;
+
     @Mappings({
             @Mapping(target = "subreddit", ignore = true),
             @Mapping(target = "subreddit.id", source = "postCreateRequestVM.subredditId"),
@@ -23,9 +30,7 @@ public interface PostMapper {
             @Mapping(target = "modificationDate", ignore = true),
             @Mapping(target = "id", ignore = true)
     })
-    Post createRequestVmToEntity(PostCreateRequestVM postCreateRequestVM, User user);
-
-    // VM
+    public abstract Post createRequestVmToEntity(PostCreateRequestVM postCreateRequestVM, User user);
 
     @Mappings({
             @Mapping(target = "creationDate", ignore = true),
@@ -34,13 +39,25 @@ public interface PostMapper {
             @Mapping(target = "user", ignore = true),
             @Mapping(target = "voteCount", ignore = true)
     })
-    Post updateRequestVmToEntity(PostUpdateRequestVM postUpdateRequestVM);
+    public abstract Post updateRequestVmToEntity(PostUpdateRequestVM postUpdateRequestVM);
 
     @Mappings({
             @Mapping(target = "author", source = "user.username"),
             @Mapping(target = "subredditId", source = "subreddit.id"),
-            @Mapping(target = "subredditName", source = "subreddit.name")
+            @Mapping(target = "subredditName", source = "subreddit.name"),
+            @Mapping(target = "commentCount", expression = "java(commentCount(post))"),
+            @Mapping(target = "duration", expression = "java(getDuration(post))"),
     })
-    PostResponseVM entityToResponseVM(Post post);
+    public abstract PostResponseVM entityToResponseVM(Post post);
+
+
+    // Util
+    private Integer commentCount(Post post) {
+        return commentRepository.countAllByPostId(post.getId());
+    }
+
+    private String getDuration(Post post) {
+        return TimeAgo.using(post.getCreationDate().getTime());
+    }
 
 }

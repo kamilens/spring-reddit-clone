@@ -17,7 +17,6 @@ import reddit.clone.reddit.service.PostService;
 import reddit.clone.reddit.vm.post.PostCreateRequestVM;
 import reddit.clone.reddit.vm.post.PostResponseVM;
 
-import javax.validation.ConstraintViolationException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,9 +64,11 @@ public class PostServiceImpl implements PostService {
 
     @Transactional(readOnly = true)
     @Override
-    public Set<PostResponseVM> getPostsBySubredditId(Long subredditId, Pageable pageable) {
-        subredditRepository.findById(subredditId)
-                .orElseThrow(() -> new NotFoundException("No subreddit found with id: " + subredditId));
+    public Set<PostResponseVM> getPostsBySubredditId(Pageable pageable, Long subredditId) {
+        if (!subredditRepository.findById(subredditId).isPresent()) {
+            throw new NotFoundException("No subreddit found with id: " + subredditId);
+        }
+
         return postRepository.findAllBySubredditId(subredditId, pageable)
                 .stream()
                 .map(postMapper::entityToResponseVM)
@@ -76,9 +77,10 @@ public class PostServiceImpl implements PostService {
 
     @Transactional(readOnly = true)
     @Override
-    public Set<PostResponseVM> getPostsByUsername(String username, Pageable pageable) {
-        userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("No user found with username: " + username));
+    public Set<PostResponseVM> getPostsByUsername(Pageable pageable, String username) {
+        if (!userRepository.findByUsername(username).isPresent()) {
+            throw new NotFoundException("No user found with username: " + username);
+        }
 
         return postRepository.findAllByUserUsername(username, pageable)
                 .stream()

@@ -56,11 +56,14 @@ public class AuthServiceImpl implements AuthService {
 
         String token = generateVerificationToken(user);
         mailService.sendMail(
-                new NotificationEmail(
-                        "Please activate your account",
-                        user.getEmail(), "Thank you for singing up to RedditClone, " +
-                        "please click on the below url to activate your account: " +
-                        "http://localhost:8080/api/auth/verification/" + token));
+                NotificationEmail.builder()
+                        .subject("Please activate your account")
+                        .recipient(user.getEmail())
+                        .body("Thank you for singing up to RedditClone, " +
+                                "please click on the below url to activate your account: " +
+                                "http://localhost:8080/api/auth/verification/" + token)
+                        .build()
+                );
     }
 
     @Override

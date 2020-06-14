@@ -21,5 +21,7 @@ public class PostResponseVM {
     private Date modificationDate;
     private Long subredditId;
     private String subredditName;
+    private Integer commentCount;
+    private String duration;
 
 }
