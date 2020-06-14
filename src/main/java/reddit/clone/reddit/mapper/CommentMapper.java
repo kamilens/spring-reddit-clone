@@ -15,7 +15,8 @@ public interface CommentMapper {
     @Mappings({
             @Mapping(target = "creationDate", ignore = true),
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "post", source = "commentCreateRequestVM.postId"),
+            @Mapping(target = "post", ignore = true),
+            @Mapping(target = "post.id", source = "commentCreateRequestVM.postId"),
             @Mapping(target = "text", source = "commentCreateRequestVM.text"),
             @Mapping(target = "user.id", source = "user.id")
     })
@@ -23,7 +24,8 @@ public interface CommentMapper {
 
     @Mappings({
             @Mapping(target = "creationDate", ignore = true),
-            @Mapping(target = "post", source = "postId"),
+            @Mapping(target = "post", ignore = true),
+            @Mapping(target = "post.id", source = "postId"),
             @Mapping(target = "text", source = "text"),
             @Mapping(target = "user", ignore = true)
     })

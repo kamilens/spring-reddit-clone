@@ -1,10 +1,10 @@
 package reddit.clone.reddit.mapper;
 
 import com.github.marlonlom.utilities.timeago.TimeAgo;
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.springframework.beans.factory.annotation.Autowired;
 import reddit.clone.reddit.domain.Post;
 import reddit.clone.reddit.domain.User;
 import reddit.clone.reddit.repository.CommentRepository;
@@ -12,11 +12,11 @@ import reddit.clone.reddit.vm.post.PostCreateRequestVM;
 import reddit.clone.reddit.vm.post.PostResponseVM;
 import reddit.clone.reddit.vm.post.PostUpdateRequestVM;
 
-@RequiredArgsConstructor
 @Mapper(componentModel = "spring")
 public abstract class PostMapper {
 
-    private final CommentRepository commentRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Mappings({
             @Mapping(target = "subreddit", ignore = true),
@@ -52,11 +52,11 @@ public abstract class PostMapper {
 
 
     // Util
-    private Integer commentCount(Post post) {
+    protected Integer commentCount(Post post) {
         return commentRepository.countAllByPostId(post.getId());
     }
 
-    private String getDuration(Post post) {
+    protected String getDuration(Post post) {
         return TimeAgo.using(post.getCreationDate().getTime());
     }
 

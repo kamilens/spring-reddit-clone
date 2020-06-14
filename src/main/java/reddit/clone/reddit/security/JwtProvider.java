@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.security.Key;
+import java.sql.Date;
+import java.time.Instant;
 
 @Service
 public class JwtProvider {
@@ -18,11 +20,23 @@ public class JwtProvider {
     @Value("${jwt.token.secret}")
     private String secret;
 
+    @Value("${jwt.token.expired}")
+    private Long jwtExpirationInMillis;
+
     public String generateToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
         return Jwts.builder()
                 .setSubject(principal.getUsername())
                 .signWith(getSigningKey())
+                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
+                .compact();
+    }
+
+    public String generateTokenWithUsername(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .signWith(getSigningKey())
+                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
                 .compact();
     }
 
@@ -45,6 +59,10 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
+    }
+
+    public Long getJwtExpirationInMillis() {
+        return jwtExpirationInMillis;
     }
 
 }

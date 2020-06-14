@@ -20,10 +20,13 @@ import reddit.clone.reddit.repository.VerificationTokenRepository;
 import reddit.clone.reddit.security.JwtProvider;
 import reddit.clone.reddit.service.AuthService;
 import reddit.clone.reddit.service.MailService;
+import reddit.clone.reddit.service.RefreshTokenService;
 import reddit.clone.reddit.vm.auth.AuthenticationResponseVM;
 import reddit.clone.reddit.vm.auth.LoginVM;
+import reddit.clone.reddit.vm.auth.RefreshTokenVM;
 import reddit.clone.reddit.vm.auth.RegisterVM;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
     private final MailService mailService;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public void register(RegisterVM registerVM) {
@@ -81,7 +85,13 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
-        return new AuthenticationResponseVM(token, loginVM.getUsername());
+        return AuthenticationResponseVM
+                .builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(loginVM.getUsername())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -91,6 +101,20 @@ public class AuthServiceImpl implements AuthService {
                 getContext().getAuthentication().getPrincipal();
         return userRepository.findByUsername(principal.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
+    }
+
+    @Override
+    public AuthenticationResponseVM refreshToken(RefreshTokenVM refreshTokenVM) {
+        refreshTokenService.validateRefreshToken(refreshTokenVM.getRefreshToken());
+
+        String token = jwtProvider.generateTokenWithUsername(refreshTokenVM.getUsername());
+        return AuthenticationResponseVM
+                .builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenVM.getRefreshToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(refreshTokenVM.getUsername())
+                .build();
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {

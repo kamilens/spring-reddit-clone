@@ -13,7 +13,7 @@ import reddit.clone.reddit.vm.vote.VoteCreateVM;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api/votes")
 public class VoteController {
 
     private final VoteService voteService;
