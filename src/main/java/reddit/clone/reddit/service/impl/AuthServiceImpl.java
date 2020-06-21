@@ -22,10 +22,7 @@ import reddit.clone.reddit.security.JwtProvider;
 import reddit.clone.reddit.service.AuthService;
 import reddit.clone.reddit.service.MailService;
 import reddit.clone.reddit.service.RefreshTokenService;
-import reddit.clone.reddit.vm.auth.AuthenticationResponseVM;
-import reddit.clone.reddit.vm.auth.LoginVM;
-import reddit.clone.reddit.vm.auth.RefreshTokenVM;
-import reddit.clone.reddit.vm.auth.RegisterVM;
+import reddit.clone.reddit.vm.auth.*;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -122,6 +119,54 @@ public class AuthServiceImpl implements AuthService {
     public boolean isLoggedId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (!(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated());
+    }
+
+    @Override
+    public void changePassword(ChangePasswordVM changePasswordVM) {
+        final User currentUser = getCurrentUser();
+        final String newPasswordFromRequestEncoded = passwordEncoder.encode(changePasswordVM.getNewPassword());
+
+        validatePassword(changePasswordVM.getCurrentPassword());
+
+        try {
+            userRepository.changePassword(currentUser.getUsername(), newPasswordFromRequestEncoded);
+        } catch (Exception ex) {
+            throw new BadRequestException();
+        }
+    }
+
+    @Override
+    public void changeEmail(ChangeEmailVM changeEmailVM) {
+        final User user = getCurrentUser();
+        validatePassword(changeEmailVM.getCurrentPassword());
+
+        try {
+            userRepository.changeEmail(user.getUsername(), changeEmailVM.getNewEmail());
+        } catch (Exception ex) {
+            throw new BadRequestException();
+        }
+    }
+
+/*
+    @Override
+    public void changeUsername(ChangeUsernameVM changeUsernameVM) {
+        final User user = getCurrentUser();
+        validatePassword(changeUsernameVM.getCurrentPassword());
+
+        try {
+            userRepository.changeUsername(user.getUsername(), changeUsernameVM.getNewUsername());
+        } catch (Exception ex) {
+            throw new BadRequestException();
+        }
+    }
+*/
+
+    private void validatePassword(String passedAsCurrentPassword) {
+        final User currentUser = getCurrentUser();
+
+        if (!passwordEncoder.matches(passedAsCurrentPassword, currentUser.getPassword())) {
+            throw new RedditException("Current password isn't valid!!");
+        }
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {

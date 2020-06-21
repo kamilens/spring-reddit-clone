@@ -49,7 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // endpoints >>>
                 .antMatchers("/api/auth/**")
                 .permitAll()
-                .antMatchers(HttpMethod.GET, "/api/subreddits")
+                .antMatchers(HttpMethod.POST, "/api/auth/change-password/")
+                .authenticated()
+                .antMatchers(HttpMethod.GET, "/api/subreddits/")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/api/posts/")
                 .permitAll()

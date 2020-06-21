@@ -6,10 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reddit.clone.reddit.service.AuthService;
 import reddit.clone.reddit.service.RefreshTokenService;
-import reddit.clone.reddit.vm.auth.AuthenticationResponseVM;
-import reddit.clone.reddit.vm.auth.LoginVM;
-import reddit.clone.reddit.vm.auth.RefreshTokenVM;
-import reddit.clone.reddit.vm.auth.RegisterVM;
+import reddit.clone.reddit.vm.auth.*;
 
 import javax.validation.Valid;
 
@@ -49,5 +46,25 @@ public class AuthController {
         refreshTokenService.deleteRefreshToken(refreshTokenVM.getRefreshToken());
         return ResponseEntity.ok().body("Refresh token deleted successfully!!");
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordVM changePasswordVM) {
+        authService.changePassword(changePasswordVM);
+        return ResponseEntity.ok().body(null);
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangeEmailVM changeEmailVM) {
+        authService.changeEmail(changeEmailVM);
+        return ResponseEntity.ok().body(null);
+    }
+
+/*
+    @PostMapping("/change-username")
+    public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangeUsernameVM changeUsernameVM) {
+        authService.changeUsername(changeUsernameVM);
+        return ResponseEntity.ok().body(null);
+    }
+*/
 
 }

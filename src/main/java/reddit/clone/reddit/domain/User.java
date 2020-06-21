@@ -45,6 +45,9 @@ public class User {
     @Column(name = "email", unique = true)
     private String email;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+    private UserProfile userProfile;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "creation_date")

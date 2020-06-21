@@ -1,9 +1,10 @@
-package reddit.clone.reddit.vm.subreddit;
+package reddit.clone.reddit.vm.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -11,19 +12,17 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubredditUpdateRequestVM {
-
-    @NotNull
-    private Long id;
+public class ChangeEmailVM {
 
     @NotBlank
     @NotNull
     @NotEmpty
-    private String name;
+    private String currentPassword;
 
     @NotBlank
     @NotNull
     @NotEmpty
-    private String description;
+    @Email
+    private String newEmail;
 
 }

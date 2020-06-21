@@ -1,4 +1,4 @@
-package reddit.clone.reddit.vm.subreddit;
+package reddit.clone.reddit.vm.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,19 +11,18 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubredditUpdateRequestVM {
-
-    @NotNull
-    private Long id;
+public class ChangePasswordVM {
 
     @NotBlank
     @NotNull
     @NotEmpty
-    private String name;
+    private String currentPassword;
 
     @NotBlank
     @NotNull
     @NotEmpty
-    private String description;
+    private String newPassword;
+
+    // TODO: logoutFromAllDevices
 
 }

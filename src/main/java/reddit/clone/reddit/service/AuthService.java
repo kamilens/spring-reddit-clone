@@ -1,10 +1,7 @@
 package reddit.clone.reddit.service;
 
 import reddit.clone.reddit.domain.User;
-import reddit.clone.reddit.vm.auth.AuthenticationResponseVM;
-import reddit.clone.reddit.vm.auth.LoginVM;
-import reddit.clone.reddit.vm.auth.RefreshTokenVM;
-import reddit.clone.reddit.vm.auth.RegisterVM;
+import reddit.clone.reddit.vm.auth.*;
 
 public interface AuthService {
 
@@ -19,5 +16,11 @@ public interface AuthService {
     AuthenticationResponseVM refreshToken(RefreshTokenVM refreshTokenVM);
 
     boolean isLoggedId();
+
+    void changePassword(ChangePasswordVM changePasswordVM);
+
+    void changeEmail(ChangeEmailVM changeEmailVM);
+
+//    void changeUsername(ChangeUsernameVM changeUsernameVM);
 
 }
