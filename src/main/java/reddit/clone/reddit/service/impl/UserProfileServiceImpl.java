@@ -2,8 +2,6 @@ package reddit.clone.reddit.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,15 +14,11 @@ import reddit.clone.reddit.mapper.UserProfileMapper;
 import reddit.clone.reddit.repository.UserProfileRepository;
 import reddit.clone.reddit.repository.UserRepository;
 import reddit.clone.reddit.service.AuthService;
+import reddit.clone.reddit.service.StorageService;
 import reddit.clone.reddit.service.UserProfileService;
 import reddit.clone.reddit.vm.user.UploadUserImagesVM;
 import reddit.clone.reddit.vm.user.UserProfileResponseVM;
 import reddit.clone.reddit.vm.user.UserProfileUpdateVM;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -32,13 +26,11 @@ import java.util.UUID;
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
 
-    @Value("${app.file-upload-dir}")
-    private String fileUploadDir;
-
     private final AuthService authService;
     private final UserProfileRepository userProfileRepository;
     private final UserProfileMapper userProfileMapper;
     private final UserRepository userRepository;
+    private final StorageService storageService;
 
     @Override
     public void updateProfileInfo(UserProfileUpdateVM userProfileUpdateVM) {
@@ -76,49 +68,31 @@ public class UserProfileServiceImpl implements UserProfileService {
         MultipartFile bannerImage = uploadUserImagesVM.getBannerImage();
 
         try {
+            String avatarFullPath = null;
             if (avatarImage != null) {
-                final String avatarImagePath = generateImagePath(avatarImage);
-                userProfileRepository.changeUserAvatarImage(avatarImagePath, currentUserProfile.getId());
+                avatarFullPath = storageService.upload(avatarImage);
+            }
+            userProfileRepository.changeUserAvatarImage(avatarFullPath, currentUserProfile.getId());
 
-                uploadImage(avatarImage, avatarImagePath);
-
-                String currentAvatarImageFullPath = currentUserProfile.getAvatarImage();
-                if (currentAvatarImageFullPath != null) {
-                    deleteImage(currentAvatarImageFullPath);
-                }
+            String currentAvatarImageFullPath = currentUserProfile.getAvatarImage();
+            if (currentAvatarImageFullPath != null) {
+                storageService.delete(currentAvatarImageFullPath);
             }
 
+
+            String bannerFullPath = null;
             if (bannerImage != null) {
-                final String bannerImagePath = generateImagePath(bannerImage);
-                userProfileRepository.changeUserBannerImage(bannerImagePath, currentUserProfile.getId());
+                bannerFullPath = storageService.upload(bannerImage);
+            }
+            userProfileRepository.changeUserBannerImage(bannerFullPath, currentUserProfile.getId());
 
-                uploadImage(bannerImage, bannerImagePath);
-
-                String currentBannerImageFullPath = currentUserProfile.getBannerImage();
-                if (currentBannerImageFullPath != null) {
-                    deleteImage(currentBannerImageFullPath);
-                }
+            String currentBannerImageFullPath = currentUserProfile.getBannerImage();
+            if (currentBannerImageFullPath != null) {
+                storageService.delete(currentBannerImageFullPath);
             }
         } catch (Exception ex) {
             throw new RedditException("Exception occurred when uploading images");
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
-    }
-
-    private String generateImagePath(MultipartFile multipartFile) {
-        final String fileExt = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
-        return fileUploadDir + UUID.randomUUID().toString() + "." + fileExt;
-    }
-
-    private void uploadImage(MultipartFile multipartImage, String imageFullPath) throws IOException {
-        File file = new File(imageFullPath);
-        multipartImage.transferTo(file);
-    }
-
-    private void deleteImage(String fullPath) throws IOException {
-        File file = new File(fullPath);
-        Files.deleteIfExists(file.toPath());
     }
 
 }
